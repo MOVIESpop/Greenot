@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <title>GREENOT AI - Cognitive Core Engine</title>
+</head>
+<body>
+    <script>
+        const GREENOT_BRAIN = {
+            welcomeMessage: "היי נעים מאוד.\nאני הסוכן בינה מלאכותית של greenot \nאני כאן לעזור לך בכל מה שאני יכול 🙏\n",
+            
+            // מילון כתובות גלובלי לכישורים הקוגניטיביים
+            appsUrls: {
+                "whatsapp": "https://web.whatsapp.com",
+                "google": "https://www.google.com",
+                "youtube": "https://www.youtube.com",
+                "instagram": "https://www.instagram.com",
+                "telegram": "https://web.telegram.org"
+            },
+
+            getDatabase() {
+                return JSON.parse(localStorage.getItem('GREENOT_AI_DATABASE')) || [];
+            },
+
+            cleanText(text) {
+                return text.replace(/[?.!,;:]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+            },
+
+            processInput(userInput) {
+                const cleanedInput = this.cleanText(userInput);
+                const database = this.getDatabase();
+                
+                let matchedCategory = null;
+
+                // חיפוש טריגר תואם במאגר
+                for (const item of database) {
+                    const hasMatch = item.triggers.some(trigger => {
+                        const cleanTrigger = this.cleanText(trigger);
+                        return cleanedInput.includes(cleanTrigger) || cleanTrigger.includes(cleanedInput);
+                    });
+
+                    if (hasMatch) {
+                        matchedCategory = item;
+                        break;
+                    }
+                }
+
+                if (matchedCategory && matchedCategory.responses.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * matchedCategory.responses.length);
+                    const chosenAnswer = matchedCategory.responses[randomIndex];
+                    
+                    // בדיקה האם משוייך כישור קוגניטיבי לחוק הזה
+                    if (matchedCategory.skill && matchedCategory.skill !== "none") {
+                        const targetUrl = this.appsUrls[matchedCategory.skill];
+                        if (targetUrl) {
+                            // השהייה מובנית של בדיוק שנייה אחת (1000ms) לאחר הצגת הודעת האישור
+                            setTimeout(() => {
+                                window.open(targetUrl, '_blank');
+                            }, 1000);
+                        }
+                    }
+
+                    return {
+                        answer: chosenAnswer,
+                        category: matchedCategory.categoryName,
+                        log: matchedCategory.skill !== "none" ? `[COGNITIVE_LAUNCH: ${matchedCategory.skill.toUpperCase()} in 1s]` : "[STANDARD_TALK]"
+                    };
+                }
+
+                return {
+                    answer: "הבנתי את הודעתך. ליבת GREENOT מעבדת את הנתונים ברגע זה ממש. 🧠",
+                    category: "DEFAULT",
+                    log: "[TRIGGER_NOT_FOUND]"
+                };
+            }
+        };
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'PROCESS_GREENOT_INPUT') {
+                const result = GREENOT_BRAIN.processInput(event.data.text);
+                
+                event.source.postMessage({
+                    type: 'GREENOT_CORE_RESPONSE',
+                    decision: {
+                        answer: result.answer,
+                        logs: ["[SCANNING_TRIGGERS]", `[CAT: ${result.category}]`, result.log],
+                        thinkingDuration: 700
+                    }
+                }, event.origin);
+            }
+        });
+
+        window.parent.postMessage({
+            type: 'GREENOT_CORE_RESPONSE',
+            decision: {
+                answer: GREENOT_BRAIN.welcomeMessage,
+                logs: ["[CORE_LOADED]", "[COGNITIVE_READY]"],
+                thinkingDuration: 400
+            }
+        }, '*');
+    </script>
+</body>
+</html>

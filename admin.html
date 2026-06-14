@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GREENOT AI - מרכז ניהול שפה וכישורים</title>
+    <style>
+        :root {
+            --bg-main: #f4f6f9;
+            --panel-bg: #ffffff;
+            --primary-color: #00b347;
+            --primary-light: rgba(0, 179, 71, 0.1);
+            --accent-cyan: #00a3ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 15px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .admin-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            padding: 15px 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        header h1 span {
+            color: var(--primary-color);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+            }
+            body {
+                padding: 30px;
+            }
+            header {
+                text-align: right;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 20px;
+                margin-bottom: 30px;
+            }
+            header h1 {
+                font-size: 24px;
+            }
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .panel:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            color: var(--text-main);
+            box-sizing: border-box;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 14px center;
+            background-size: 16px;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: #fff;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .tags-input-container {
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 50px;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .tags-input-container:focus-within {
+            border-color: var(--primary-color);
+            background: #fff;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .tag {
+            background: var(--primary-light);
+            border: 1px solid rgba(0, 179, 71, 0.2);
+            color: var(--primary-color);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            animation: popIn 0.2s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .tag span {
+            cursor: pointer;
+            font-weight: 800;
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .tag span:hover {
+            color: #ef4444;
+        }
+
+        .tags-input-container input {
+            border: none !important;
+            background: transparent !important;
+            color: var(--text-main);
+            flex: 1;
+            min-width: 120px;
+            padding: 6px 0;
+            font-size: 15px;
+        }
+
+        .tags-input-container input:focus {
+            outline: none;
+        }
+
+        .btn {
+            background: var(--text-main);
+            color: #fff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn.edit-mode {
+            background: var(--accent-cyan);
+        }
+
+        .rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 680px;
+            overflow-y: auto;
+            padding-left: 5px;
+        }
+
+        .rule-card {
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .rule-card:hover {
+            background: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .badges-wrapper {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 50px;
+        }
+
+        .skill-badge {
+            display: inline-block;
+            background: rgba(0, 163, 255, 0.1);
+            border: 1px solid rgba(0, 163, 255, 0.3);
+            color: var(--accent-cyan);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 50px;
+        }
+
+        .rule-actions {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn.edit { color: var(--accent-cyan); }
+        .action-btn.delete { color: #ef4444; }
+        .action-btn:hover { opacity: 0.7; }
+
+        .rule-triggers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .rule-trigger-badge {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 13px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .rule-responses {
+            font-size: 14px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <header>
+        <h1>GREENOT AI // <span>מרכז ניהול שפה וכישורים</span></h1>
+    </header>
+
+    <div class="grid">
+        <div class="panel">
+            <h2 id="formTitle">הוספת יכולת דיבור וקטגוריה</h2>
+            
+            <div class="form-group">
+                <label>מילות מפתח / טריגרים (הקש נקודה . או פסיק כדי לייצר בועה)</label>
+                <div class="tags-input-container" id="triggersContainer">
+                    <input type="text" id="triggerInput" placeholder="למשל: תפתח פה יוטיוב.">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>שיוך לקטגוריות ניתוח (מופרד בפסיקים)</label>
+                <input type="text" id="categoryInput" placeholder="למשל: אפליקציות, ניווט">
+            </div>
+
+            <div class="form-group">
+                <label>הפעלת כישור קוגניטיבי (ייפתח אוטומטית שניה אחרי הודעת האישור)</label>
+                <select id="skillSelect">
+                    <option value="none">ללא פתיחת אפליקציה (טקסט בלבד)</option>
+                    <option value="whatsapp">וואטצאפ (WhatsApp)</option>
+                    <option value="google">גוגל (Google)</option>
+                    <option value="youtube">יוטיוב (YouTube)</option>
+                    <option value="instagram">אינסטגרם (Instagram)</option>
+                    <option value="telegram">טלגרם (Telegram Web)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>הודעות אישור של הסוכן (כל שורה היא אופציה - למשל: פותח לך את היישום, תהנה!)</label>
+                <textarea id="responsesInput" rows="4" placeholder="פקודתך התקבלה, פותח וואטצאפ...&#10;מיד מעביר אותך לגוגל..."></textarea>
+            </div>
+
+            <button class="btn" id="submitBtn" onclick="saveRule()">הזרק למוח המערכת 🚀</button>
+        </div>
+
+        <div class="panel">
+            <h2>יכולות וכישורים מוגדרים</h2>
+            <div class="rules-list" id="rulesList"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeTriggers = [];
+    let editingRuleId = null;
+    
+    const triggerInput = document.getElementById('triggerInput');
+    const triggersContainer = document.getElementById('triggersContainer');
+    const formTitle = document.getElementById('formTitle');
+    const submitBtn = document.getElementById('submitBtn');
+
+    triggerInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        if (value.endsWith('.') || value.endsWith(',')) {
+            const cleanTag = value.slice(0, -1).trim();
+            if (cleanTag && !activeTriggers.includes(cleanTag)) {
+                activeTriggers.push(cleanTag);
+                renderTags();
+            }
+            triggerInput.value = '';
+        }
+    });
+
+    function renderTags() {
+        document.querySelectorAll('.tag').forEach(el => el.remove());
+        activeTriggers.forEach((tag, index) => {
+            const tagEl = document.createElement('div');
+            tagEl.className = 'tag';
+            tagEl.innerHTML = `${tag} <span onclick="removeTag(${index})">&times;</span>`;
+            triggersContainer.insertBefore(tagEl, triggerInput);
+        });
+    }
+
+    function removeTag(index) {
+        activeTriggers.splice(index, 1);
+        renderTags();
+    }
+
+    function getDatabase() {
+        return JSON.parse(localStorage.getItem('GREENOT_AI_DATABASE')) || [];
+    }
+
+    function saveRule() {
+        const categories = document.getElementById('categoryInput').value.trim();
+        const responsesText = document.getElementById('responsesInput').value.trim();
+        const associatedSkill = document.getElementById('skillSelect').value;
+
+        if (activeTriggers.length === 0 || !categories || !responsesText) {
+            alert('אנא מלא את כל השדות וצור לפחות טריגר אחד');
+            return;
+        }
+
+        const responses = responsesText.split('\n').map(r => r.trim()).filter(r => r.length > 0);
+        let database = getDatabase();
+
+        if (editingRuleId !== null) {
+            database = database.map(rule => {
+                if (rule.id === editingRuleId) {
+                    return {
+                        ...rule,
+                        triggers: activeTriggers,
+                        categoryName: categories,
+                        responses: responses,
+                        skill: associatedSkill
+                    };
+                }
+                return rule;
+            });
+            editingRuleId = null;
+            formTitle.innerText = "הוספת יכולת דיבור וקטגוריה";
+            submitBtn.innerText = "הזרק למוח המערכת 🚀";
+            submitBtn.classList.remove('edit-mode');
+        } else {
+            const newRule = {
+                id: Date.now(),
+                triggers: activeTriggers,
+                categoryName: categories,
+                responses: responses,
+                skill: associatedSkill
+            };
+            database.push(newRule);
+        }
+
+        localStorage.setItem('GREENOT_AI_DATABASE', JSON.stringify(database));
+
+        activeTriggers = [];
+        renderTags();
+        document.getElementById('categoryInput').value = '';
+        document.getElementById('responsesInput').value = '';
+        document.getElementById('skillSelect').value = 'none';
+        
+        renderRulesList();
+    }
+
+    function editRule(id) {
+        const database = getDatabase();
+        const ruleToEdit = database.find(rule => rule.id === id);
+        
+        if (!ruleToEdit) return;
+
+        editingRuleId = id;
+        activeTriggers = [...ruleToEdit.triggers];
+        renderTags();
+
+        document.getElementById('categoryInput').value = ruleToEdit.categoryName;
+        document.getElementById('responsesInput').value = ruleToEdit.responses.join('\n');
+        document.getElementById('skillSelect').value = ruleToEdit.skill || 'none';
+
+        formTitle.innerText = "עריכת יכולת קיימת ✏️";
+        submitBtn.innerText = "עדכן שינויים במוח 💾";
+        submitBtn.classList.add('edit-mode');
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteRule(id) {
+        if (confirm('האם אתה בטוח שברצונך למחוק יכולת זו?')) {
+            let database = getDatabase();
+            database = database.filter(rule => rule.id !== id);
+            localStorage.setItem('GREENOT_AI_DATABASE', JSON.stringify(database));
+            renderRulesList();
+        }
+    }
+
+    function renderRulesList() {
+        const listContainer = document.getElementById('rulesList');
+        const database = getDatabase();
+        listContainer.innerHTML = '';
+
+        if (database.length === 0) {
+            listContainer.innerHTML = '<div style="color: var(--text-muted); text-align:center; padding-top:40px; font-size: 14px;">אין עדיין יכולות במערכת.</div>';
+            return;
+        }
+
+        database.forEach(rule => {
+            const card = document.createElement('div');
+            card.className = 'rule-card';
+            
+            const triggersHTML = rule.triggers.map(t => `<span class="rule-trigger-badge">${t}</span>`).join('');
+            const responsesHTML = rule.responses.map(r => `• ${r}`).join('<br>');
+            const skillText = rule.skill && rule.skill !== 'none' ? `🧠 כישור: פתח ${rule.skill}` : '💬 שיחה בלבד';
+
+            card.innerHTML = `
+                <div class="rule-actions">
+                    <span class="action-btn edit" onclick="editRule(${rule.id})">ערוך ✏️</span>
+                    <span class="action-btn delete" onclick="deleteRule(${rule.id})">מחק 🗑️</span>
+                </div>
+                <div class="badges-wrapper">
+                    <div class="category-badge">${rule.categoryName}</div>
+                    <div class="skill-badge">${skillText}</div>
+                </div>
+                <div class="rule-triggers">${triggersHTML}</div>
+                <div class="rule-responses">${responsesHTML}</div>
+            `;
+            listContainer.appendChild(card);
+        });
+    }
+
+    renderRulesList();
+</script>
+</body>
+</html>
